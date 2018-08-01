@@ -797,7 +797,7 @@ function apply_statistic(stat::TickStatistic,
     for var in in_vars
         categorical && !in(var,[:x,:y]) && continue
         vals = getfield(aes, var)
-        if vals != nothing && eltype(vals) != Function
+        if vals != nothing && eltype(vals) != Function && !(eltype(vals) <: Measure)
             if minval == nothing
                 minval = first(vals)
             end
