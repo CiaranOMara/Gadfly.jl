@@ -44,17 +44,12 @@ function render(geom::RectangularGeometry, theme::Gadfly.Theme, aes::Gadfly.Aest
     Gadfly.assert_aesthetics_defined("RectangularGeometry", aes, :xmin, :xmax, :ymin, :ymax)
     Gadfly.assert_aesthetics_equal_length("RectangularGeometry", aes, :xmin, :xmax, :ymin, :ymax)
 
-    nx = length(aes.xmin)
-    ny = length(aes.ymin)
-    n = nx
-
     xmin = aes.xmin
-    xwidths = [(x1 - x0)*cx
-               for (x0, x1) in zip(aes.xmin, aes.xmax)]
-
+    xmax = aes.xmax
     ymin = aes.ymin
-    ywidths = [(y1 - y0)*cy
-               for (y0, y1) in zip(aes.ymin, aes.ymax)]
+    ymax = aes.ymax
+
+    n = length(xmin)
 
     if length(aes.color) == n
         cs = aes.color
@@ -82,6 +77,12 @@ function render(geom::RectangularGeometry, theme::Gadfly.Theme, aes::Gadfly.Aest
         ymax = ymax[visibility]
     end
 
+    xwidths = [(x1 - x0)*cx
+               for (x0, x1) in zip(xmin, xmax)]
+
+    ywidths = [(y1 - y0)*cy
+               for (y0, y1) in zip(ymin, ymax)]
+
     return compose!(
         context(),
         rectangle(xmin, ymin, xwidths, ywidths, geom.tag),
@@ -90,20 +91,20 @@ function render(geom::RectangularGeometry, theme::Gadfly.Theme, aes::Gadfly.Aest
         svgclass("geometry"),
         svgattribute("shape-rendering", "crispEdges"))
 
-    # TODO: determine performance hit of using polygons.
-    # polys = Vector{Vector{Tuple{Measure, Measure}}}(n)
-    # for i in 1:n
-    #     x0 = x_measure(aes.xmin[i])
-    #     x1 = x_measure(aes.xmax[i])
-    #     y0 = y_measure(aes.ymin[i])
-    #     y1 = y_measure(aes.ymax[i])
+    # # TODO: determine performance hit of using polygons.
+    # polys = Vector{Vector{Tuple{Measure, Measure}}}(undef, length(xmin))
+    # for i in 1:length(xmin)
+    #     x0 = x_measure(xmin[i])
+    #     x1 = x_measure(xmax[i])
+    #     y0 = y_measure(ymin[i])
+    #     y1 = y_measure(ymax[i])
     #     polys[i] = Tuple{Measure, Measure}[(x0, y0), (x0, y1), (x1, y1), (x1, y0)]
     # end
     #
     # return compose!(
     #     context(),
     #     Compose.polygon(polys),
-    #     fill(color),
+    #     fill(cs),
     #     stroke(nothing),
     #     svgclass("geometry"),
     #     svgattribute("shape-rendering", "crispEdges"))
