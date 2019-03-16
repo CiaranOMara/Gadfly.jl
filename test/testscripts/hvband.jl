@@ -1,10 +1,10 @@
 using Gadfly
+set_default_plot_size(21cm, 8cm)
 
-set_default_plot_size(6inch, 3inch)
+p1 = plot(x=collect(1:9), y=collect(1:9), Geom.point,
+          layer(xmin=[5.0, 7.0], xmax=[6.5, 8.0] , Geom.vband, Theme(default_color="green")));
 
-layer_data = layer(x=collect(1:10), y=collect(1:10), Geom.point)
+p2 = plot(x=collect(1:9), y=collect(1:9), Geom.point,
+          layer(ymin=[2.5, 3.6], ymax=[3.0, 4.0], Geom.hband, Theme(default_color="red")));
 
-plot_hvbands = hstack(
-    # plot(layer_data, layer(xintercept=[4], Geom.vline)),
-    plot(layer_data, layer(xmin=[2], xmax=[4], Geom.vband(color="green")), layer(xmin=[6], xmax=[6.5], Geom.vband)),
-    plot(layer_data, layer(ymin=[2,6], ymax=[4,6.5], Geom.hband(color="red"))))
+hstack(p1, p2)
