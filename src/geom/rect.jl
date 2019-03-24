@@ -23,7 +23,7 @@ const rect = RectangularGeometry
 default_statistic(geom::RectangularGeometry) = geom.default_statistic
 
 element_aesthetics(::RectangularGeometry) =
-        [:xmin, :xmax, :ymin, :ymax, :color]
+        [:x, :y, :xmin, :xmax, :ymin, :ymax, :color]
 
 # Render rectangle geometry.
 #
