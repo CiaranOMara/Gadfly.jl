@@ -809,6 +809,20 @@ function render_prepared(plot::Plot,
     # IV. Geometries
     themes = Theme[layer.theme === nothing ? plot.theme : layer.theme
                    for layer in plot.layers]
+
+    for (layer, stats, aes, theme) in zip(plot.layers, layer_stats, layer_aess, themes)
+
+        if length(stats) > 1 #TODO: remove! This is placed here to get a better understanding of what was coming through.
+            @warn "stats" stats
+        end
+
+        for stat in stats
+            Geom.apply_theme_transformations!(layer.geom, stat, aes, theme)
+#             Geom.apply_colours!(layer.geom, stat, aes, theme) #TODO: remove example.
+#             Geom.apply_strokes!(layer.geom, stat, aes, theme) #TODO: remove example.
+        end
+    end
+
     zips = trim_zip(plot.layers, layer_aess,
                                                    layer_subplot_aess,
                                                    layer_subplot_datas,
@@ -1098,9 +1112,9 @@ function display(d::GadflyDisplay, ::MIME"application/pdf", p::Union{Plot,Compos
 end
 
 include("coord.jl")
-include("geometry.jl")
 include("guide.jl")
 include("statistics.jl")
+include("geometry.jl")
 
 
 # All aesthetics must have a scale. If none is given, we use a default.

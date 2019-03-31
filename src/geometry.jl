@@ -33,6 +33,8 @@ end
 
 const nil = Nil
 
+apply_theme_transformations!(geom::Gadfly.GeometryElement, stat::Gadfly.StatisticElement, aes::Gadfly.Aesthetics, theme::Gadfly.Theme) = (println("apply_theme_transformations! called"); nothing) #TODO: remove println.
+
 render(geom::Nil, theme::Gadfly.Theme, aes::Gadfly.Aesthetics,
         data::Gadfly.Data, scales::Dict{Symbol, ScaleElement},
         subplot_layer_aess::Vector{Gadfly.Aesthetics}) = nothing

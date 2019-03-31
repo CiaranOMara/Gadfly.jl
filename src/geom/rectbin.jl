@@ -27,3 +27,12 @@ function histogram2d(; xbincount=nothing, xminbincount=3, xmaxbincount=150,
                                 yminbincount = yminbincount,
                                 ymaxbincount = ymaxbincount))
 end
+
+
+function apply_theme_transformations!(geom::RectangularGeometry, stat::Union{Gadfly.Stat.RectbinStatistic, Gadfly.Stat.histogram2d}, aes::Gadfly.Aesthetics, theme::Gadfly.Theme)
+
+    println("apply_theme_transformations! specific to geom::Geom.RectangularGeometry, stat::Stat.RectbinStatistic combination.") #TODO: remove println.
+
+	 aes.xmax = aes.xmax .* cx .- theme.bar_spacing
+	 aes.ymax = aes.ymax .* cy .- theme.bar_spacing
+end
