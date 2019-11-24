@@ -2,6 +2,12 @@ include(joinpath(@__DIR__,"..","src","open_file.jl"))
 
 using ArgParse, LibGit2
 
+masterout = joinpath((@__DIR__), "master-output")
+develout  = joinpath((@__DIR__), "devel-output")
+diffedout = joinpath((@__DIR__), "diffed-output")
+ndifferentfiles = 0
+const creator_producer = r"(Creator|Producer)"
+
 s = ArgParseSettings()
 @add_arg_table s begin
     "--diff"
@@ -13,12 +19,17 @@ s = ArgParseSettings()
     "--bw"
         help = "generate, save and display a B&W difference image for PNG and SVG files.  requires Rsvg, Cairo, and Images"
         action = :store_true
+    "--side-by-side", "-x"
+        help = "generate and save side by side images for PNG files.  requires Compose, Cairo, and Fontconfig"
+        action = :store_true
     "filter"
         help = "a regular expression describing the filenames to compare"
         default=""
 end
 
 args = parse_args(s)
+
+@info args
 
 if args["bw"]
     using Rsvg, Cairo, Images
@@ -35,6 +46,33 @@ if args["bw"]
         rm(fout)
         png
     end
+end
+
+if args["side-by-side"]
+    using Compose, Cairo, Fontconfig
+    # mkpath(joinpath(dirname(@__FILE__, "")))
+    path_side_by_side = joinpath((@__DIR__), "diffed-output-side_by_side")
+
+    function generate_side_by_side(file::String)
+
+        path_master = joinpath(path_side_by_side, masterout, file)
+        path_devel = joinpath(path_side_by_side, develout, file)
+
+        title = compose(context(), Compose.text(0.5, 0, file, hcenter, vcenter), fontsize(18pt))
+
+        label_master = compose(context(), Compose.text(0.5, 0, "Master", hcenter, vtop), fontsize(14pt))
+        label_develop = compose(context(), Compose.text(0.5, 0, "Develop", hcenter, vtop), fontsize(14pt))
+        labels = hstack(label_master, label_develop)
+
+        img_master = compose(context(), bitmap("image/png", read(path_master), 0,0, 1,1))
+        img_devel = compose(context(), bitmap("image/png", read(path_devel), 0,0, 1,1))
+        imgs = hstack(img_master, img_devel)
+
+        # img |> PNG(joinpath(path_side_by_side, file))
+        vstack(title, labels, imgs) |> SVG(joinpath(path_side_by_side, file[1:end-length("png")] * "svg"))
+
+    end
+
 end
 
 # delete diffedoutput/
@@ -59,11 +97,6 @@ function display_two(master,devel)
 end
 
 # Compare with cached output
-masterout = joinpath((@__DIR__), "master-output")
-develout  = joinpath((@__DIR__), "devel-output")
-diffedout = joinpath((@__DIR__), "diffed-output")
-ndifferentfiles = 0
-const creator_producer = r"(Creator|Producer)"
 filter_mkdir_git(x) = !mapreduce(y->x==y,|,[".mkdir","git.log","git.status"])
 filter_regex(x) = occursin(Regex(args["filter"]), x)
 master_files = filter(x->filter_mkdir_git(x) && filter_regex(x), readdir(masterout))
@@ -126,6 +159,9 @@ for file in intersect(master_files,devel_files)
                 wait_for_user = true
                 println("PNGs are different sizes :(")
             end
+        end
+        if args["side-by-side"] &&  endswith(file,".png")
+            generate_side_by_side(file)
         end
         args["diff"] || args["two"] || (args["bw"] &&
                 (endswith(file,".svg") || endswith(file,".png")) && wait_for_user) || continue
