@@ -58,18 +58,28 @@ if args["side-by-side"]
         path_master = joinpath(path_side_by_side, masterout, file)
         path_devel = joinpath(path_side_by_side, develout, file)
 
-        title = compose(context(), Compose.text(0.5, 0, file, hcenter, vcenter), fontsize(18pt))
 
-        label_master = compose(context(), Compose.text(0.5, 0, "Master", hcenter, vtop), fontsize(14pt))
-        label_develop = compose(context(), Compose.text(0.5, 0, "Develop", hcenter, vtop), fontsize(14pt))
-        labels = hstack(label_master, label_develop)
+        title(ctx::Context, str::String, props::Compose.Property...) = vstack(
+            compose(context(0, 0, 1, 0.1), Compose.text(0.5, 1.0, str, hcenter, vbottom), props...),
+            compose(context(0, 0, 1, 0.9), ctx))
 
-        img_master = compose(context(), bitmap("image/png", read(path_master), 0,0, 1,1))
-        img_devel = compose(context(), bitmap("image/png", read(path_devel), 0,0, 1,1))
-        imgs = hstack(img_master, img_devel)
+        # title = compose(context(), Compose.text(0.5, 0, file, hcenter, vcenter), fontsize(18pt))
+        #
+        # label_master = compose(context(), Compose.text(0.5, 0, "Master", hcenter, vtop), fontsize(14pt))
+        # label_develop = compose(context(), Compose.text(0.5, 0, "Develop", hcenter, vtop), fontsize(14pt))
+        # labels = hstack(label_master, label_develop)
+
+        # img_master = compose(context(), bitmap("image/png", read(path_master), 0,0, 1,1))
+        # img_devel = compose(context(), bitmap("image/png", read(path_devel), 0,0, 1,1))
+
+        img_master = compose(context(), bitmap("image/png", read(path_master), 0,0, 1w,1h))
+        img_devel = compose(context(), bitmap("image/png", read(path_devel), 0,0, 1w,1h))
+        imgs = hstack( title(img_master, "master"), title(img_devel, "develop"))
+
+        img = title(imgs, file)
 
         # img |> PNG(joinpath(path_side_by_side, file))
-        vstack(title, labels, imgs) |> SVG(joinpath(path_side_by_side, file[1:end-length("png")] * "svg"))
+        img |> SVG(joinpath(path_side_by_side, file[1:end-length("png")] * "svg"))
 
     end
 
