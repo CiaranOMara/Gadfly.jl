@@ -20,6 +20,8 @@ function concretize(xss::AbstractVector...)
         return xss
     end
 
+    @info "concretizing" length.(xss) xss...
+
     count = 0
     for j in 1:length(xss[1])
         for xs in xss
@@ -52,6 +54,8 @@ function concretize(xss::AbstractVector...)
 
         @label next_j2
     end
+
+    @info "returning" yss...
 
     return tuple(yss...)
 end
