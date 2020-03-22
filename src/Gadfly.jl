@@ -153,7 +153,7 @@ Layer(l::Layer) = Layer(l.data_source, l.mapping, l.statistics, l.geom, l.theme,
 copy(l::Layer) = Layer(l)
 
 """
-    layer(data_source::Union{AbstractDataFrame, Void}),
+    layer(data_source::Union{AbstractDataFrame, Nothing}),
           elements::ElementOrFunction...; mapping...) -> [Layers]
 
 Create a layer element based on the data in `data_source`, to later input into
@@ -313,7 +313,7 @@ function plot(elements::ElementOrFunctionOrLayers...; mapping...)
 end
 
 """
-    plot(data_source::Union{Void, AbstractMatrix, AbstractDataFrame},
+    plot(data_source::Union{Nothing, AbstractMatrix, AbstractDataFrame},
          mapping::Dict, elements::ElementOrFunctionOrLayers...) -> Plot
 
 The old fashioned (pre-named arguments) version of plot.  This version takes an
