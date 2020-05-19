@@ -4,16 +4,8 @@ isconcrete(x::(Irrational)) = true
 isconcrete(x) = !ismissing(x)
 
 function isallconcrete(xs)
-    ans = true
-    for x in xs
-        if !isconcrete(x)
-            ans = false
-            break
-        end
-    end
-    return ans
+    return all(isconcrete, xs)
 end
-
 
 function concretize(xss::AbstractVector...)
     if all(map(isallconcrete, xss))
