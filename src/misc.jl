@@ -111,8 +111,8 @@ function concrete_minmax(xs, xmin::T, xmax::T) where T<:Real
         return xmin, xmax
     end
 
-    for x in xs
-        if !ismissing(x) && isconcrete(x)
+    for x in skipmissing(xs)
+        if isconcrete(x)
             xT = convert(T, x)
             if isnan(xmin) || xT < xmin
                 xmin = xT
@@ -127,8 +127,8 @@ end
 
 
 function concrete_minmax(xs, xmin::T, xmax::T) where T
-    for x in xs
-        if !ismissing(x) && isconcrete(x)
+    for x in skipmissing(xs)
+        if isconcrete(x)
             xT = convert(T, x)
             if xT < xmin
                 xmin = xT
