@@ -59,13 +59,7 @@ end
 
 # How many concrete elements in an iterable
 function concrete_length(xs)
-    n = 0
-    for x in xs
-        if !ismissing(x) && isconcrete(x)
-            n += 1
-        end
-    end
-    n
+    return count(isconcrete, skipmissing(xs))
 end
 
 function concrete_length(xs::Iterators.Flatten)
