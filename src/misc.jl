@@ -257,49 +257,54 @@ svg_color_class_from_label(label::AbstractString) = @sprintf("color_%s", escape_
 using Dates
 
 # Arbitrarily order colors
-color_isless(a::Color, b::Color) =
-        color_isless(convert(RGB{Float32}, a), convert(RGB{Float32}, b))
-color_isless(a::TransparentColor, b::TransparentColor) =
-        color_isless(convert(RGBA{Float32}, a), convert(RGBA{Float32}, b))
+color_isless(a::Color, b::Color) = color_isless(convert(RGB{Float32}, a), convert(RGB{Float32}, b))
+color_isless(a::TransparentColor, b::TransparentColor) = color_isless(convert(RGBA{Float32}, a), convert(RGBA{Float32}, b))
 
 
 function color_isless(a::RGB{Float32}, b::RGB{Float32})
-    if a.r < b.r
-        return true
-    elseif a.r == b.r
-        if a.g < b.g
-            return true
-        elseif a.g == b.g
-            return a.b < b.b
-        else
-            return false
-        end
-    else
+    if a.r > b.r
         return false
     end
+
+    if a.g > b.g
+        return false
+    end
+
+    if a.b > b.b
+        return false
+    end
+
+    if a.r == b.r && a.g == b.g && a.b == b.b
+        return false
+    end
+
+    return true
 end
 
 
 function color_isless(a::RGBA{Float32}, b::RGBA{Float32})
     if color_isless(color(a), color(b))
         return true
-    elseif color(a) == color(b)
-        return a.alpha < b.alpha
-    else
-        return false
     end
+
+    if color(a) == color(b)
+        return a.alpha < b.alpha
+    end
+
+    return false
 end
 
 
-function group_color_isless(a::(Tuple{S, T}),
-                            b::(Tuple{S, T})) where {S, T <: Colorant}
+function group_color_isless(a::(Tuple{S, T}), b::(Tuple{S, T})) where {S, T <: Colorant}
     if a[1] < b[1]
         return true
-    elseif a[1] == b[1]
-        return color_isless(a[2], b[2])
-    else
-        return false
     end
+
+    if a[1] == b[1]
+        return color_isless(a[2], b[2])
+    end
+
+    return false
 end
 
 
